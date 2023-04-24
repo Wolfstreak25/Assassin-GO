@@ -131,11 +131,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   utilityType: 0
-  neighbourTiles: []
+  neighbourTiles:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   linkedNodes:
   - direction: 1
     tile: {fileID: 0}
-  isEndTile: 0
   isPlayerTile: 0
   isEnemyTile: 0
 --- !u!1001 &1081250636303022265

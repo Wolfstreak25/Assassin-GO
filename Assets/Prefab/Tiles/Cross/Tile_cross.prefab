@@ -131,10 +131,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 52f08f3dbad6139428c8f48e65d52553, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   utilityType: 0
-  neighbourTiles: []
+  neighbourTiles:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   linkedNodes:
   - direction: 1
     tile: {fileID: 0}
@@ -144,7 +148,6 @@ MonoBehaviour:
     tile: {fileID: 0}
   - direction: 4
     tile: {fileID: 0}
-  isEndTile: 0
   isPlayerTile: 0
   isEnemyTile: 0
 --- !u!1001 &518553337078975382

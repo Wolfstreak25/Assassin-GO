@@ -9,14 +9,9 @@ public class Tile : MonoBehaviour
     [Header("Neighbour Connections")] //Linked Nodes
     [SerializeField] private List<Tile> neighbourTiles = new List<Tile>();
     [SerializeField] private List<LinkedNodes> linkedNodes = new List<LinkedNodes>();
-    [SerializeField] private bool isEndTile;
-    [SerializeField] private bool isPlayerTile;
+    [SerializeField] public bool isPlayerTile;
     [SerializeField] private bool isEnemyTile;
-    public bool PlayerTile { get { return isPlayerTile; } }
-    private List<EnemyController> enemy = new List<EnemyController>();
-    // private EnemyController enemy;
-    private PlayerController player;
-    // private Transform nextTile;
+    private Transform nextTile;
     private Vector3 m_coordinate = new Vector3();
     public Vector3 Coordinate { get { return m_coordinate; } }
     // [SerializeField] private List<NeighbourTiles> neighbourTiles;
@@ -35,14 +30,14 @@ public class Tile : MonoBehaviour
     {
         m_coordinate = gameObject.transform.position;
     }
-    public Tile NextTile(MoveTo direction)
+    public Transform NextTile(MoveTo direction)
     {
         foreach (var item in linkedNodes)
         {
             if (item.direction == direction)
             {
-                // nextTile =  item.tile;
-                return item.tile;
+                nextTile = item.tile;
+                return nextTile;
             }
         }
         return null;
@@ -68,65 +63,14 @@ public class Tile : MonoBehaviour
         for (int i = 0; i < linkedNodes.Count; i++)
         {
             var dir = linkedNodes[i].direction.ToV3();
-            var tileLink = neighbourTiles.Find(n => n.Coordinate == Coordinate + FloorBoard.spacing * dir);
-            linkedNodes[i].tile = tileLink;
+            var tileLink = neighbourTiles.Find(n => n.Coordinate == Coordinate + dir);
+            linkedNodes[i].tile = tileLink.gameObject.transform;
         }
     }
     [System.Serializable]
     public class LinkedNodes
     {
         public MoveTo direction;
-        public Tile tile;
-    }
-    public void UseUtility()
-    {
-        // Use Utility if any
-        if (utilityType != UtilityType.none)
-        {
-
-        }
-    }
-    public void SetPlayerTile(PlayerController _player)
-    {
-        if (isEnemyTile)
-        {
-            foreach (var item in enemy)
-            {
-                item.GetDamage();
-            }
-            UnsetEnemyTile();
-        }
-        if (isEndTile)
-        {
-            UIManager.Instance.LevelEndUI();
-        }
-        player = _player;
-        isPlayerTile = true;
-    }
-    public void UnsetPlayerTile()
-    {
-        player = null;
-        isPlayerTile = false;
-    }
-    public void SetEnemyTile(EnemyController _enemy)
-    {
-        if (isPlayerTile)
-        {
-            player.GetDamage();
-            UnsetPlayerTile();
-        }
-        enemy.Add(_enemy);
-        isEnemyTile = true;
-    }
-    private void UnsetEnemyTile()
-    {
-        enemy.Clear();
-        isEnemyTile = false;
-    }
-    public void UnsetEnemyTile(EnemyController _enemy)
-    {
-        enemy.Remove(_enemy);
-        if (enemy.Count == 0)
-            isEnemyTile = false;
+        public Transform tile;
     }
 }

@@ -9,8 +9,9 @@ public class Tile : MonoBehaviour
     [Header("Neighbour Connections")] //Linked Nodes
     [SerializeField] private List<Tile> neighbourTiles = new List<Tile>();
     [SerializeField] private List<LinkedNodes> linkedNodes = new List<LinkedNodes>();
+    [SerializeField] public bool isEndTile;
     [SerializeField] public bool isPlayerTile;
-    [SerializeField] private bool isEnemyTile;
+    [SerializeField] public bool isEnemyTile;
     private Transform nextTile;
     private Vector3 m_coordinate = new Vector3();
     public Vector3 Coordinate { get { return m_coordinate; } }
@@ -72,5 +73,13 @@ public class Tile : MonoBehaviour
     {
         public MoveTo direction;
         public Transform tile;
+    }
+    public void UseUtility()
+    {
+        // Use Utility if any
+        if (utilityType != UtilityType.none)
+        {
+
+        }
     }
 }

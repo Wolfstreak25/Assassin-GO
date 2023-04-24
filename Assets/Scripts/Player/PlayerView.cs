@@ -9,17 +9,30 @@ public class PlayerView : MonoBehaviour
     private PlayerController Controller;
     private Vector3 movement;
     private float m_timeElapsed = 0f;
+    private bool isEnemyTurn = false;
+    private void OnEnable()
+    {
+        TurnManager.onEnemyMove += EnemyTurn;
+    }
+    private void OnDisable()
+    {
+        TurnManager.onEnemyMove -= EnemyTurn;
+    }
     private void Update()
     {
         m_timeElapsed += Time.deltaTime;
-        if (Input.GetKeyDown(KeyCode.W))
-            Controller.Move(MoveTo.Forward);
-        if (Input.GetKeyDown(KeyCode.A))
-            Controller.Move(MoveTo.Left);
-        if (Input.GetKeyDown(KeyCode.S))
-            Controller.Move(MoveTo.Backward);
-        if (Input.GetKeyDown(KeyCode.D))
-            Controller.Move(MoveTo.Right);
+        if (!isEnemyTurn)
+        {
+            if (Input.GetKeyDown(KeyCode.W))
+                Controller.Move(MoveTo.Forward);
+            if (Input.GetKeyDown(KeyCode.A))
+                Controller.Move(MoveTo.Left);
+            if (Input.GetKeyDown(KeyCode.S))
+                Controller.Move(MoveTo.Backward);
+            if (Input.GetKeyDown(KeyCode.D))
+                Controller.Move(MoveTo.Right);
+        }
+        isEnemyTurn = true;
     }
     public void SetController(PlayerController _controller)
     {
@@ -36,5 +49,9 @@ public class PlayerView : MonoBehaviour
     public bool isDead()
     {
         return Controller.isDetected;
+    }
+    private void EnemyTurn()
+    {
+        isEnemyTurn = false;
     }
 }

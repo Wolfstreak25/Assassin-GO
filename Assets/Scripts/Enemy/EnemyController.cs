@@ -1,104 +1,85 @@
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 public class EnemyController
 {
-    public EnemyType enemyType;
-    public EnemyView View{get; private set;}
-    public bool isDetected{get;private set;}
-    protected bool isMoving = false;
-    protected Tile tile;
-    protected MoveTo faceDirection;
-    // protected Quaternion spawnRotation;
-    public EnemyController(EnemyProps enemyData)
+
+    public EnemyModel Model { get; private set; }
+    public EnemyView View { get; private set; }
+    public bool isDetected { get; private set; }
+    private bool isMoving = false;
+    private Transform tileTransform;
+
+    private Tile tile;
+    Sequence sequence;
+    public Animator animator { get; private set; }
+
+    public EnemyController(EnemyModel Enemymodel, EnemyView _view, Tile _tile)
     {
-        // spawnRotation = enemyData.faceDirection.ToQuat();
-        // Debug.Log(spawnRotation.eulerAngles);
-        tile = enemyData.spawnTile;
-        faceDirection = enemyData.faceDirection;
-        tile.SetEnemyTile(this);
-        View = GameObject.Instantiate<EnemyView>(enemyData.enemyPrefab, tile.Coordinate, Turn(faceDirection));
-        // Turn(faceDirection);
+        tile = _tile;
+        tileTransform = _tile.transform;
+        tile.isEnemyTile = true;
+        isDetected = false;
+        this.Model = Enemymodel;
+        View = GameObject.Instantiate<EnemyView>(_view, tile.transform.position, Quaternion.identity);
         this.View.SetController(this);
+        this.Model.SetController(this);
+        animator = View.GetComponent<Animator>();
     }
-    protected Quaternion Turn(MoveTo direction)
+    // public void Move(MoveTo direction)
+    // {
+    //     var next = tile.NextTile(direction);
+    //     if(!isMoving && next != null)
+    //     {
+    //         isMoving = true;
+    //         sequence = DOTween.Sequence().Insert(0,View.transform.DOMove(next.transform.position, 1f, false ));
+    //         Turn(direction.ToV3());
+    //         sequence.OnComplete(() => {
+    //                                     EnemyMoved(next);
+    //                                     TurnManager.EnemyMoved();
+    //                             });
+    //     }
+    //     return;
+    // }
+    public void Move(MoveTo direction)
     {
-        float y = 0f;
-        switch(direction)
+        var next = tile.NextTile(direction);
+        if (next == null)
         {
-            case MoveTo.Forward:
-                y = 0f;
-                break;
-            case MoveTo.Backward:
-                y = 180f;
-                break;
-            case MoveTo.Left:
-                y = -90f;
-                break;
-            case MoveTo.Right:
-                y = 90f;
-                break;
+            Turn(Vector3.back);
         }
-        return Quaternion.Euler(0f,y,0f);
-    }
-    protected virtual void Move()
-    {
-            var next = GetNextTile(faceDirection);
+        next = tile.NextTile(direction);
+        if (!isMoving && next != null)
+        {
             isMoving = true;
-            View.transform.position = next.Coordinate;
-            EnemyMoved(next);
-            return;
-    }
-    public virtual void EnemyTurn()
-    {
-        
-    }
-    protected virtual void NoMove()
-    {
-        return;          
-    }
-    protected virtual void TurnAround()
-    {
-        Vector3 angles =  View.transform.eulerAngles;
-        View.transform.eulerAngles = angles;
-        switch(faceDirection)
-        {
-            case MoveTo.Forward:
-                faceDirection = MoveTo.Backward;
-                angles.y = 180;
-                break;
-            case MoveTo.Backward:
-                faceDirection = MoveTo.Forward;
-                angles.y = 0;
-                break;
-            case MoveTo.Left:
-                faceDirection = MoveTo.Right;
-                angles.y = 90;
-                break;
-            case MoveTo.Right:
-                faceDirection = MoveTo.Left;
-                angles.y = -90;
-                break;
+            sequence = DOTween.Sequence().Insert(0, View.transform.DOMove(next.transform.position, 1f, false));
+            Turn(direction.ToV3());
+            sequence.OnComplete(() =>
+            {
+                EnemyMoved(next);
+                TurnManager.EnemyMoved();
+            });
         }
-        View.transform.eulerAngles = angles;
+        return;
     }
-    public virtual void GetDamage()
+    public void Turn(Vector3 direction)
     {
-        Debug.Log("Called damage enemy");
+        Quaternion rotateEnemy = Quaternion.LookRotation(direction);
+        View.transform.rotation = rotateEnemy;
+    }
+    public void GetDamage(float damage)
+    {
         isDetected = true;
         View.DestroyObj();
         // EventManagement.Instance.EnemyDeath();
     }
-    
-    protected virtual void EnemyMoved(Tile next)
+
+    private void EnemyMoved(Transform next)
     {
-        isMoving = false; 
-        tile.UnsetEnemyTile(this); 
-        tile = next;
-        tile.SetEnemyTile(this);
-    }
-    protected virtual Tile GetNextTile(MoveTo direction)
-    {
-        Tile next = tile.NextTile(faceDirection);
-        return next;
+        isMoving = false;
+        tile.isEnemyTile = false;
+        tileTransform = next;
+        tile = next.gameObject.GetComponent<Tile>();
+        tile.isEnemyTile = true;
     }
 }

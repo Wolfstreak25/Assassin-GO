@@ -12,10 +12,7 @@ public class PlayerController
     private Tile tile;
     Sequence sequence;
     public Animator animator{get;private set;}
-    private void OnDisable() 
-    {
-        //    EventManagement.Instance.OnEnemyDeath -= AmmoDrop;
-    }
+
     public PlayerController(PlayerModel Playermodel, PlayerView _view,Tile _tile)
     {
         tile = _tile;
@@ -38,11 +35,9 @@ public class PlayerController
             sequence = DOTween.Sequence().Insert(0,View.transform.DOMove(next.transform.position, 1f, false ));
             Turn(direction.ToV3());
             sequence.OnComplete(() => {
-                                        isMoving = false; 
-                                        tile.isPlayerTile = false; 
-                                        tileTransform = next; 
-                                        tile = next.gameObject.GetComponent<Tile>();
-                                        tile.isPlayerTile = true;
+                                        PlayerMoved(next);
+                                        UseUtility();
+                                        TurnManager.PlayerMoved();
                                 });
         }
         return;
@@ -58,8 +53,17 @@ public class PlayerController
             View.DestroyObj();
             // EventManagement.Instance.PlayerDeath();
     }
-    public void AmmoDrop()
+    
+    private void UseUtility()
     {
-        Model.Ammo += 5;
+        tile.UseUtility();
+    }
+    private void PlayerMoved(Transform next)
+    {
+        isMoving = false; 
+        tile.isPlayerTile = false; 
+        tileTransform = next; 
+        tile = next.gameObject.GetComponent<Tile>();
+        tile.isPlayerTile = true;
     }
 }

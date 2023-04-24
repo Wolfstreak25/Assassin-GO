@@ -4,86 +4,73 @@ using UnityEngine;
 
 public class Tile : MonoBehaviour
 {
-    [SerializeField]    private UtilityType utilityType;
+    [SerializeField] private UtilityType utilityType;
     private UtilityController utility;
     [Header("Neighbour Connections")] //Linked Nodes
-    // [SerializeField]    private Tile leftTile;
-    // [SerializeField]    private Tile rightTile;
-    // [SerializeField]    private Tile forwardTile;
-    // [SerializeField]    private Tile backTile;
-    [SerializeField]    public bool isPlayerTile;
-    [SerializeField]    private bool isEnemyTile;
+    [SerializeField] private List<Tile> neighbourTiles = new List<Tile>();
+    [SerializeField] private List<LinkedNodes> linkedNodes = new List<LinkedNodes>();
+    [SerializeField] public bool isPlayerTile;
+    [SerializeField] private bool isEnemyTile;
     private Transform nextTile;
+    private Vector3 m_coordinate = new Vector3();
+    public Vector3 Coordinate { get { return m_coordinate; } }
     // [SerializeField] private List<NeighbourTiles> neighbourTiles;
     void Start()
     {
-        if(utilityType != UtilityType.none)
+
+        if (utilityType != UtilityType.none)
         {
             utility = UtilityService.Instance.GetUtility(utilityType);
         }
+        NeighbourTiles();
+        LinkToNeighbourTiles();
     }
 
-   public Transform NextTile (MoveTo direction)
-   {
-        switch(direction)
+    private void Awake()
+    {
+        m_coordinate = gameObject.transform.position;
+    }
+    public Transform NextTile(MoveTo direction)
+    {
+        foreach (var item in linkedNodes)
         {
-            case MoveTo.Forward:
-                nextTile = NeighbourTiles(Vector3.forward);
-                break;
-            case MoveTo.Backward:
-                nextTile = NeighbourTiles(Vector3.back);;
-                break;
-            case MoveTo.Left:
-                nextTile = NeighbourTiles(Vector3.left);;
-                break;
-            case MoveTo.Right:
-                nextTile = NeighbourTiles(Vector3.right);;
-                break;
+            if (item.direction == direction)
+            {
+                nextTile = item.tile;
+                return nextTile;
+            }
         }
-        return nextTile;
-   }
-   private Transform NeighbourTiles(Vector3 direction)
-   {
-        var nTile = FloorBoard.Instance.Tiles.Find(n => n.transform.position == transform.position + direction);
-        return nTile;
-   }
+        return null;
+
+    }
+    private void NeighbourTiles()
+    {
+        var board = FloorBoard.Instance;
+        foreach (Vector3 dir in FloorBoard.directions)
+        {
+            // find a neighboring node at the current direction...
+            Tile foundNeighbor = board.Tiles.Find(n => n.Coordinate == Coordinate + dir);
+
+            // if we find a neighbor at this direction, add it to the list
+            if (foundNeighbor != null && !neighbourTiles.Contains(foundNeighbor))
+            {
+                neighbourTiles.Add(foundNeighbor);
+            }
+        }
+    }
+    private void LinkToNeighbourTiles()
+    {
+        for (int i = 0; i < linkedNodes.Count; i++)
+        {
+            var dir = linkedNodes[i].direction.ToV3();
+            var tileLink = neighbourTiles.Find(n => n.Coordinate == Coordinate + dir);
+            linkedNodes[i].tile = tileLink.gameObject.transform;
+        }
+    }
+    [System.Serializable]
+    public class LinkedNodes
+    {
+        public MoveTo direction;
+        public Transform tile;
+    }
 }
-
-
-// [System.Serializable]
-// struct NeighbourTiles
-// {
-//     public MoveTo tileDirection;
-//     private Tile m_tile;
-//     public Tile tile
-//     {
-//         get
-//         {
-//             m_tile = FloorBoard.Instance.Tiles.Find(n => n.transform.position == transform.position + m_tile.direction);
-//             return m_tile;
-//         }
-//     }
-//     private Vector3 dir;
-//     public Vector3 direction
-//     {
-//         get
-//         {
-//             switch(tileDirection)
-//             {
-//                 case MoveTo.Forward:
-//                     dir = Vector3.forward;
-//                     break;
-//                 case MoveTo.Backward:
-//                     dir = Vector3.back;
-//                     break;
-//                 case MoveTo.Left:
-//                     dir = Vector3.left;
-//                     break;
-//                 case MoveTo.Right:
-//                     dir = Vector3.right;
-//                     break;
-//             }
-//             return dir;
-//         }
-//     }
-// } 

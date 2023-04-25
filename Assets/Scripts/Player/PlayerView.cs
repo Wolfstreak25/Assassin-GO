@@ -32,7 +32,6 @@ public class PlayerView : MonoBehaviour
             if(Input.GetKeyDown(KeyCode.D))
                 Controller.Move(MoveTo.Right);
         }
-        isEnemyTurn = true;
     }
     public void SetController(PlayerController _controller)
     {
@@ -41,10 +40,6 @@ public class PlayerView : MonoBehaviour
     public void DestroyObj()
     {
         Destroy(this.gameObject);
-    }
-    public void GetDamage(float damage)
-    {
-       Controller.GetDamage(damage);
     }
     public bool isDead()
     {

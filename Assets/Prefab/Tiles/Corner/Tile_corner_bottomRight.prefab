@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 7444236936861447993}
   - component: {fileID: 6968834209816945633}
   m_Layer: 0
-  m_Name: Tile_corner_1
+  m_Name: Tile_corner_bottomRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -132,16 +132,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   utilityType: 0
-  neighbourTiles:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  neighbourTiles: []
   linkedNodes:
   - direction: 3
     tile: {fileID: 0}
   - direction: 1
     tile: {fileID: 0}
+  isEndTile: 0
   isPlayerTile: 0
   isEnemyTile: 0
 --- !u!1001 &4685890900261485630

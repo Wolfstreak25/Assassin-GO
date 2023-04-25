@@ -9,9 +9,12 @@ public class Tile : MonoBehaviour
     [Header("Neighbour Connections")] //Linked Nodes
     [SerializeField] private List<Tile> neighbourTiles = new List<Tile>();
     [SerializeField] private List<LinkedNodes> linkedNodes = new List<LinkedNodes>();
-    [SerializeField] public bool isEndTile;
-    [SerializeField] public bool isPlayerTile;
-    [SerializeField] public bool isEnemyTile;
+    [SerializeField] private bool isEndTile;
+    [SerializeField] private bool isPlayerTile;
+    [SerializeField] private bool isEnemyTile;
+    // public bool EndTile{get{return isEndTile;}}
+    private EnemyController enemy;
+    private PlayerController player;
     private Transform nextTile;
     private Vector3 m_coordinate = new Vector3();
     public Vector3 Coordinate { get { return m_coordinate; } }
@@ -81,5 +84,39 @@ public class Tile : MonoBehaviour
         {
 
         }
+    }
+    public void SetPlayerTile(PlayerController _player)
+    {
+        if (isEnemyTile)
+        {
+            enemy.GetDamage();
+            UnsetEnemyTile();
+        }
+        if (isEndTile)
+        {
+            Debug.Log("Endgame");
+        }
+        player = _player;
+        isPlayerTile = true;
+    }
+    public void UnsetPlayerTile()
+    {
+        player = null;
+        isPlayerTile = false;
+    }
+    public void SetEnemyTile(EnemyController _enemy)
+    {
+        if (isPlayerTile)
+        {
+            player.GetDamage();
+            UnsetPlayerTile();
+        }
+        enemy = _enemy;
+        isEnemyTile = true;
+    }
+    public void UnsetEnemyTile()
+    {
+        enemy = null;
+        isEnemyTile = false;
     }
 }

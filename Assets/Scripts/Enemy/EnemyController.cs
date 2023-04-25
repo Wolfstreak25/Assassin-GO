@@ -18,7 +18,7 @@ public class EnemyController
     {
         tile = _tile;
         tileTransform = _tile.transform;
-        tile.isEnemyTile = true;
+        tile.SetEnemyTile(this);
         isDetected = false;
         this.Model = Enemymodel;
         View = GameObject.Instantiate<EnemyView>(_view, tile.transform.position, Quaternion.identity);
@@ -26,29 +26,14 @@ public class EnemyController
         this.Model.SetController(this);
         animator = View.GetComponent<Animator>();
     }
-    // public void Move(MoveTo direction)
-    // {
-    //     var next = tile.NextTile(direction);
-    //     if(!isMoving && next != null)
-    //     {
-    //         isMoving = true;
-    //         sequence = DOTween.Sequence().Insert(0,View.transform.DOMove(next.transform.position, 1f, false ));
-    //         Turn(direction.ToV3());
-    //         sequence.OnComplete(() => {
-    //                                     EnemyMoved(next);
-    //                                     TurnManager.EnemyMoved();
-    //                             });
-    //     }
-    //     return;
-    // }
     public void Move(MoveTo direction)
     {
         var next = tile.NextTile(direction);
         if (next == null)
         {
-            Turn(Vector3.back);
+            Debug.Log("called");
+            TurnAround();
         }
-        next = tile.NextTile(direction);
         if (!isMoving && next != null)
         {
             isMoving = true;
@@ -62,13 +47,22 @@ public class EnemyController
         }
         return;
     }
-    public void Turn(Vector3 direction)
+    private void Turn(Vector3 direction)
     {
         Quaternion rotateEnemy = Quaternion.LookRotation(direction);
         View.transform.rotation = rotateEnemy;
     }
-    public void GetDamage(float damage)
+    private void TurnAround()
     {
+        Vector3 angles = View.transform.eulerAngles;
+        angles.y += 180;
+        View.transform.eulerAngles = angles;
+        var direction = View.transform.forward;
+        Move(direction.ToMoveTo());
+    }
+    public void GetDamage()
+    {
+        Debug.Log("Called damage enemy");
         isDetected = true;
         View.DestroyObj();
         // EventManagement.Instance.EnemyDeath();
@@ -77,9 +71,9 @@ public class EnemyController
     private void EnemyMoved(Transform next)
     {
         isMoving = false;
-        tile.isEnemyTile = false;
+        tile.UnsetEnemyTile();
         tileTransform = next;
         tile = next.gameObject.GetComponent<Tile>();
-        tile.isEnemyTile = true;
+        tile.SetEnemyTile(this);
     }
 }

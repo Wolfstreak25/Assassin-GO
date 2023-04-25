@@ -17,7 +17,7 @@ public class PlayerController
     {
         tile = _tile;
         tileTransform = _tile.transform;
-        tile.isPlayerTile = true;
+        tile.SetPlayerTile(this);
         isDetected = false;
         this.Model = Playermodel;
         View = GameObject.Instantiate<PlayerView>(_view, tile.transform.position, Quaternion.identity);
@@ -48,8 +48,9 @@ public class PlayerController
         Quaternion rotatePlayer = Quaternion.LookRotation(direction);
         View.transform.rotation = rotatePlayer;
     }
-    public void GetDamage(float damage)
+    public void GetDamage()
     {
+        Debug.Log("Called damage player");
         isDetected = true;
         View.DestroyObj();
         // EventManagement.Instance.PlayerDeath();
@@ -62,9 +63,9 @@ public class PlayerController
     private void PlayerMoved(Transform next)
     {
         isMoving = false;
-        tile.isPlayerTile = false;
+        tile.UnsetPlayerTile();
         tileTransform = next;
         tile = next.gameObject.GetComponent<Tile>();
-        tile.isPlayerTile = true;
+        tile.SetPlayerTile(this);
     }
 }

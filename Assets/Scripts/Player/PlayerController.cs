@@ -49,7 +49,7 @@ public class PlayerController
     }
     public void GetDamage()
     {
-        Debug.Log("Called damage player");
+        UIManager.Instance.LevelEndUI();
             isDetected = true;
             View.DestroyObj();
             // EventManagement.Instance.PlayerDeath();

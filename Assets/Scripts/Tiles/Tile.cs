@@ -94,7 +94,7 @@ public class Tile : MonoBehaviour
         }
         if (isEndTile)
         {
-            Debug.Log("Endgame");
+            UIManager.Instance.LevelEndUI();
         }
         player = _player;
         isPlayerTile = true;

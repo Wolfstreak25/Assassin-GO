@@ -3,17 +3,13 @@ using UnityEngine;
 
 public class EnemyModel
 {
-    public float TurnSpeed;
-    private float health;
     private EnemyController EnemyController;
     // private EnemyObject EnemyObject;
-
-    // public EnemyModel(EnemyObject _EnemyObject)
-    // {
-    //     this.EnemyObject = _EnemyObject;
-    //     TurnSpeed = EnemyObject.TurnSpeed;
-    //     health = EnemyObject.Health;
-    // }
+    public EnemyType enemyType { get; private set; }
+    public EnemyModel(EnemyProps enemy)
+    {
+        enemyType = enemy.enemyType;
+    }
 
     public void SetController(EnemyController Enemycontroller)
     {

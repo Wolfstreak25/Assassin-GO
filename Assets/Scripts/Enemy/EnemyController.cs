@@ -3,28 +3,33 @@ using UnityEngine.UI;
 using DG.Tweening;
 public class EnemyController
 {
+    public EnemyType enemyType;
 
     public EnemyModel Model { get; private set; }
     public EnemyView View { get; private set; }
     public bool isDetected { get; private set; }
-    private bool isMoving = false;
+    protected bool isMoving = false;
     private Transform tileTransform;
 
-    private Tile tile;
+    protected Tile tile;
     Sequence sequence;
     public Animator animator { get; private set; }
-
-    public EnemyController(EnemyModel Enemymodel, EnemyView _view, Tile _tile)
+    public EnemyController(EnemyModel Enemymodel, EnemyView _view, Tile _tile, Quaternion _rotation)
     {
         tile = _tile;
         tileTransform = _tile.transform;
         tile.SetEnemyTile(this);
         isDetected = false;
         this.Model = Enemymodel;
-        View = GameObject.Instantiate<EnemyView>(_view, tile.transform.position, Quaternion.identity);
+        View = GameObject.Instantiate<EnemyView>(_view, tile.transform.position, _rotation);
         this.View.SetController(this);
         this.Model.SetController(this);
         animator = View.GetComponent<Animator>();
+    }
+    protected void Turn(Vector3 direction)
+    {
+        Quaternion rotateEnemy = Quaternion.LookRotation(direction);
+        View.transform.rotation = rotateEnemy;
     }
     public void Move(MoveTo direction)
     {
@@ -38,7 +43,7 @@ public class EnemyController
         {
             isMoving = true;
             sequence = DOTween.Sequence().Insert(0, View.transform.DOMove(next.transform.position, 1f, false));
-            Turn(direction.ToV3());
+            // Turn(direction.ToV3());
             sequence.OnComplete(() =>
             {
                 EnemyMoved(next);
@@ -47,12 +52,11 @@ public class EnemyController
         }
         return;
     }
-    private void Turn(Vector3 direction)
+    public void NoMove()
     {
-        Quaternion rotateEnemy = Quaternion.LookRotation(direction);
-        View.transform.rotation = rotateEnemy;
+        TurnManager.EnemyMoved();
     }
-    private void TurnAround()
+    public void TurnAround()
     {
         Vector3 angles = View.transform.eulerAngles;
         angles.y += 180;
@@ -68,7 +72,7 @@ public class EnemyController
         // EventManagement.Instance.EnemyDeath();
     }
 
-    private void EnemyMoved(Transform next)
+    protected void EnemyMoved(Transform next)
     {
         isMoving = false;
         tile.UnsetEnemyTile();

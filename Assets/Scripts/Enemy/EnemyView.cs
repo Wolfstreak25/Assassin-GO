@@ -5,7 +5,6 @@ using UnityEngine.UI;
 using DG.Tweening;
 public class EnemyView : MonoBehaviour
 {
-    [SerializeField] private bool isStatic = true;
     [SerializeField] private Tile EnemyTile;
     private EnemyController Controller;
     private Vector3 movement;
@@ -13,11 +12,11 @@ public class EnemyView : MonoBehaviour
     private bool isPlayerTurn = true;
     private void OnEnable()
     {
-        TurnManager.onPlayerMove += PlayerTurn;
+        TurnManager.onPlayerMove += EnemyTurn;
     }
     private void OnDisable()
     {
-        TurnManager.onPlayerMove -= PlayerTurn;
+        TurnManager.onPlayerMove -= EnemyTurn;
     }
     public void SetController(EnemyController _controller)
     {
@@ -31,16 +30,23 @@ public class EnemyView : MonoBehaviour
     {
         return Controller.isDetected;
     }
-    private void PlayerTurn()
+    private void EnemyTurn()
     {
         isPlayerTurn = false;
-        if (!isStatic)
+        switch (Controller.Model.enemyType)
         {
-            Controller.Move(transform.forward.ToMoveTo());  // ToMoveTo is an Extension function
-        }
-        if (isStatic)
-        {
-            TurnManager.EnemyMoved();
+            case EnemyType.Static:
+                Debug.Log("static enemy turn");
+                Controller.NoMove();
+                break;
+            case EnemyType.Patrol:
+                Debug.Log("patrol enemy turn");
+                Controller.Move(transform.forward.ToMoveTo());
+                break;
+            case EnemyType.Rotating:
+                Debug.Log("rotating enemy turn");
+                Controller.TurnAround();
+                break;
         }
     }
 }

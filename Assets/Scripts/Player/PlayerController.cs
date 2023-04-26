@@ -54,6 +54,10 @@ public class PlayerController
         isDetected = true;
         View.DestroyObj();
         // EventManagement.Instance.PlayerDeath();
+        UIManager.Instance.LevelEndUI();
+        isDetected = true;
+        View.DestroyObj();
+        // EventManagement.Instance.PlayerDeath();git sta
     }
 
     private void UseUtility()

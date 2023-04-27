@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< Updated upstream:Assets/Models/LevelLayoutAsset.meta
 guid: 4f7cbcdd8f994a44da1f5d3fa148b114
+=======
+guid: 5daa43d354ed3fc4cb4bd34848e97b16
+>>>>>>> Stashed changes:Assets/ExternalUI Package/Buttons/PNG.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

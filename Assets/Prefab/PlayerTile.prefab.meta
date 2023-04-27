@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< Updated upstream:Assets/Prefab/PlayerTile.prefab.meta
 guid: 33610d98eb2969f4fbf504f7ac0027e2
+=======
+guid: 25f6330df03f05c40b7560f737f86ab1
+>>>>>>> Stashed changes:Assets/Prefab/Tiles/EndTile/Tile_end_left.prefab.meta
 PrefabImporter:
   externalObjects: {}
   userData: 

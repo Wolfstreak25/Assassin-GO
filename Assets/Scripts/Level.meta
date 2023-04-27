@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< Updated upstream:Assets/Scripts/Level.meta
 guid: 8ae711be78563a848ac04d2a499303bc
+=======
+guid: fee85b05a536f1b4daffa94d432d25d9
+>>>>>>> Stashed changes:Assets/ExternalUI Package/2D Casual UI/Original Artwork.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

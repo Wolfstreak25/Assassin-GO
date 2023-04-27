@@ -1,5 +1,11 @@
 fileFormatVersion: 2
+<<<<<<< Updated upstream:Assets/Scenes/SampleScene.unity.meta
 guid: 9fc0d4010bbf28b4594072e72b8655ab
+=======
+guid: 6ef89f96db280d54e805e5edfd6c3027
+timeCreated: 1486041554
+licenseType: Store
+>>>>>>> Stashed changes:Assets/ExternalUI Package/2D Casual UI/readme.rtf.meta
 DefaultImporter:
   externalObjects: {}
   userData: 

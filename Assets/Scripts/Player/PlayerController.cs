@@ -1,22 +1,17 @@
 using UnityEngine;
 using UnityEngine.UI;
-using DG.Tweening;
 public class PlayerController
 {
-
     public PlayerModel Model { get; private set; }
     public PlayerView View { get; private set; }
     public bool isDetected { get; private set; }
     private bool isMoving = false;
-    private Transform tileTransform;
     private Tile tile;
-    Sequence sequence;
     public Animator animator { get; private set; }
 
     public PlayerController(PlayerModel Playermodel, PlayerView _view, Tile _tile)
     {
         tile = _tile;
-        tileTransform = _tile.transform;
         tile.SetPlayerTile(this);
         isDetected = false;
         this.Model = Playermodel;
@@ -32,14 +27,12 @@ public class PlayerController
         if (!isMoving && next != null)
         {
             isMoving = true;
-            sequence = DOTween.Sequence().Insert(0, View.transform.DOMove(next.transform.position, 1f, false));
+            View.transform.position = next.Coordinate;
             Turn(direction.ToV3());
-            sequence.OnComplete(() =>
-            {
-                PlayerMoved(next);
-                UseUtility();
-                TurnManager.PlayerMoved();
-            });
+            PlayerMoved(next);
+            UseUtility();
+            TurnManager.PlayerMoved();
+
         }
         return;
     }
@@ -50,26 +43,21 @@ public class PlayerController
     }
     public void GetDamage()
     {
-        Debug.Log("Called damage player");
+        UIManager.Instance.PlayerDeathUI();
         isDetected = true;
         View.DestroyObj();
         // EventManagement.Instance.PlayerDeath();
-        UIManager.Instance.LevelEndUI();
-        isDetected = true;
-        View.DestroyObj();
-        // EventManagement.Instance.PlayerDeath();git sta
     }
 
     private void UseUtility()
     {
         tile.UseUtility();
     }
-    private void PlayerMoved(Transform next)
+    private void PlayerMoved(Tile next)
     {
         isMoving = false;
         tile.UnsetPlayerTile();
-        tileTransform = next;
-        tile = next.gameObject.GetComponent<Tile>();
+        tile = next;
         tile.SetPlayerTile(this);
     }
 }

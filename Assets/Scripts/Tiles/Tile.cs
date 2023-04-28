@@ -12,10 +12,11 @@ public class Tile : MonoBehaviour
     [SerializeField] private bool isEndTile;
     [SerializeField] private bool isPlayerTile;
     [SerializeField] private bool isEnemyTile;
-    // public bool EndTile{get{return isEndTile;}}
-    private EnemyController enemy;
+    public bool PlayerTile { get { return isPlayerTile; } }
+    private List<EnemyController> enemy = new List<EnemyController>();
+    // private EnemyController enemy;
     private PlayerController player;
-    private Transform nextTile;
+    // private Transform nextTile;
     private Vector3 m_coordinate = new Vector3();
     public Vector3 Coordinate { get { return m_coordinate; } }
     // [SerializeField] private List<NeighbourTiles> neighbourTiles;
@@ -34,14 +35,14 @@ public class Tile : MonoBehaviour
     {
         m_coordinate = gameObject.transform.position;
     }
-    public Transform NextTile(MoveTo direction)
+    public Tile NextTile(MoveTo direction)
     {
         foreach (var item in linkedNodes)
         {
             if (item.direction == direction)
             {
-                nextTile = item.tile;
-                return nextTile;
+                // nextTile =  item.tile;
+                return item.tile;
             }
         }
         return null;
@@ -67,15 +68,15 @@ public class Tile : MonoBehaviour
         for (int i = 0; i < linkedNodes.Count; i++)
         {
             var dir = linkedNodes[i].direction.ToV3();
-            var tileLink = neighbourTiles.Find(n => n.Coordinate == Coordinate + dir);
-            linkedNodes[i].tile = tileLink.gameObject.transform;
+            var tileLink = neighbourTiles.Find(n => n.Coordinate == Coordinate + FloorBoard.spacing * dir);
+            linkedNodes[i].tile = tileLink;
         }
     }
     [System.Serializable]
     public class LinkedNodes
     {
         public MoveTo direction;
-        public Transform tile;
+        public Tile tile;
     }
     public void UseUtility()
     {
@@ -89,7 +90,10 @@ public class Tile : MonoBehaviour
     {
         if (isEnemyTile)
         {
-            enemy.GetDamage();
+            foreach (var item in enemy)
+            {
+                item.GetDamage();
+            }
             UnsetEnemyTile();
         }
         if (isEndTile)
@@ -111,12 +115,18 @@ public class Tile : MonoBehaviour
             player.GetDamage();
             UnsetPlayerTile();
         }
-        enemy = _enemy;
+        enemy.Add(_enemy);
         isEnemyTile = true;
     }
-    public void UnsetEnemyTile()
+    private void UnsetEnemyTile()
     {
-        enemy = null;
+        enemy.Clear();
         isEnemyTile = false;
+    }
+    public void UnsetEnemyTile(EnemyController _enemy)
+    {
+        enemy.Remove(_enemy);
+        if (enemy.Count == 0)
+            isEnemyTile = false;
     }
 }

@@ -130,21 +130,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   utilityType: 0
-  leftTile: {fileID: 0}
-  rightTile: {fileID: 0}
-  forwardTile: {fileID: 0}
-  backTile: {fileID: 0}
+  neighbourTiles:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  linkedNodes: []
+  isEndTile: 0
   isPlayerTile: 0
   isEnemyTile: 0
-  neighbourTiles:
-  - tileDirection: 0
-    tile: {fileID: 0}
-  - tileDirection: 1
-    tile: {fileID: 0}
-  - tileDirection: 2
-    tile: {fileID: 0}
-  - tileDirection: 3
-    tile: {fileID: 0}
 --- !u!1001 &6214567717389996011
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -204,6 +198,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 9283b5219555b3b45ac260f98c04df3f, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 7227227432350729689, guid: d6e454833345d034d871064110cf0799, type: 3}
     - target: {fileID: 919132149155446097, guid: 9283b5219555b3b45ac260f98c04df3f, type: 3}
       propertyPath: m_Name
       value: Dot_Large

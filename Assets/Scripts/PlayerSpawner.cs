@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerSpawner : MonoBehaviour
 {
-    [SerializeField] private PlayerModel model;
+    private PlayerModel model;
     [SerializeField] private PlayerView view;
     [SerializeField] private Tile playerSpawnTile;
     void Start()

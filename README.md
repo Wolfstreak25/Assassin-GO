@@ -22,6 +22,10 @@ This a clone of Hitman Go. The project is just made for fun and learning. this i
         3. Keys and gates
         4. Disguise functionality.
 # Screenshots
+![Screenshot (69)](https://user-images.githubusercontent.com/108297565/235146704-1bca3816-c044-4a41-8ef6-8031b15641bc.png)
+
+![Screenshot (69) - Copy](https://user-images.githubusercontent.com/108297565/235147219-50158c80-1e9e-46c7-a20b-b1991729baa4.png)
+
 ![Screenshot (36)](https://user-images.githubusercontent.com/108297565/233934513-568bd0f5-ae37-4c7a-b5eb-bc4a945e8879.png)
 
 ![Screenshot (37)](https://user-images.githubusercontent.com/108297565/233934528-858407c8-84d1-4198-87ad-7b87b0638a81.png)

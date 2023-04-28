@@ -5,9 +5,14 @@ using UnityEngine.SceneManagement;
 
 public class NextButton : MonoBehaviour
 {
+    Scene scene;
+    private void OnEnable() 
+    {
+        Debug.Log("called");
+        scene = SceneManager.GetActiveScene();
+    }
     public void Next()
     {
-        Scene scene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(scene.buildIndex + 1);
     }
     // public void NextPanel()

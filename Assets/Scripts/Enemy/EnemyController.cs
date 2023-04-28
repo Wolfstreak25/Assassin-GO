@@ -1,70 +1,87 @@
-using UnityEngine;
+susing UnityEngine;
 using UnityEngine.UI;
-using DG.Tweening;
 public class EnemyController
 {
     public EnemyType enemyType;
-
-    public EnemyModel Model { get; private set; }
     public EnemyView View { get; private set; }
     public bool isDetected { get; private set; }
     protected bool isMoving = false;
-    private Transform tileTransform;
-
     protected Tile tile;
-    Sequence sequence;
-    public Animator animator { get; private set; }
-    public EnemyController(EnemyModel Enemymodel, EnemyView _view, Tile _tile, Quaternion _rotation)
+    protected MoveTo faceDirection;
+    // protected Quaternion spawnRotation;
+    public EnemyController(EnemyProps enemyData)
     {
-        tile = _tile;
-        tileTransform = _tile.transform;
+        // spawnRotation = enemyData.faceDirection.ToQuat();
+        // Debug.Log(spawnRotation.eulerAngles);
+        tile = enemyData.spawnTile;
+        faceDirection = enemyData.faceDirection;
         tile.SetEnemyTile(this);
-        isDetected = false;
-        this.Model = Enemymodel;
-        View = GameObject.Instantiate<EnemyView>(_view, tile.transform.position, _rotation);
+        View = GameObject.Instantiate<EnemyView>(enemyData.enemyPrefab, tile.Coordinate, Turn(faceDirection));
+        // Turn(faceDirection);
         this.View.SetController(this);
-        this.Model.SetController(this);
-        animator = View.GetComponent<Animator>();
     }
-    protected void Turn(Vector3 direction)
+    protected Quaternion Turn(MoveTo direction)
     {
-        Quaternion rotateEnemy = Quaternion.LookRotation(direction);
-        View.transform.rotation = rotateEnemy;
+        float y = 0f;
+        switch (direction)
+        {
+            case MoveTo.Forward:
+                y = 0f;
+                break;
+            case MoveTo.Backward:
+                y = 180f;
+                break;
+            case MoveTo.Left:
+                y = -90f;
+                break;
+            case MoveTo.Right:
+                y = 90f;
+                break;
+        }
+        return Quaternion.Euler(0f, y, 0f);
     }
-    public void Move(MoveTo direction)
+    protected virtual void Move()
     {
-        var next = tile.NextTile(direction);
-        if (next == null)
-        {
-            Debug.Log("called");
-            TurnAround();
-        }
-        if (!isMoving && next != null)
-        {
-            isMoving = true;
-            sequence = DOTween.Sequence().Insert(0, View.transform.DOMove(next.transform.position, 1f, false));
-            // Turn(direction.ToV3());
-            sequence.OnComplete(() =>
-            {
-                EnemyMoved(next);
-                TurnManager.EnemyMoved();
-            });
-        }
+        var next = GetNextTile(faceDirection);
+        isMoving = true;
+        View.transform.position = next.Coordinate;
+        EnemyMoved(next);
         return;
     }
-    public void NoMove()
+    public virtual void EnemyTurn()
     {
-        TurnManager.EnemyMoved();
+
     }
-    public void TurnAround()
+    protected virtual void NoMove()
+    {
+        return;
+    }
+    protected virtual void TurnAround()
     {
         Vector3 angles = View.transform.eulerAngles;
-        angles.y += 180;
         View.transform.eulerAngles = angles;
-        var direction = View.transform.forward;
-        Move(direction.ToMoveTo());
+        switch (faceDirection)
+        {
+            case MoveTo.Forward:
+                faceDirection = MoveTo.Backward;
+                angles.y = 180;
+                break;
+            case MoveTo.Backward:
+                faceDirection = MoveTo.Forward;
+                angles.y = 0;
+                break;
+            case MoveTo.Left:
+                faceDirection = MoveTo.Right;
+                angles.y = 90;
+                break;
+            case MoveTo.Right:
+                faceDirection = MoveTo.Left;
+                angles.y = -90;
+                break;
+        }
+        View.transform.eulerAngles = angles;
     }
-    public void GetDamage()
+    public virtual void GetDamage()
     {
         Debug.Log("Called damage enemy");
         isDetected = true;
@@ -72,12 +89,16 @@ public class EnemyController
         // EventManagement.Instance.EnemyDeath();
     }
 
-    protected void EnemyMoved(Transform next)
+    protected virtual void EnemyMoved(Tile next)
     {
         isMoving = false;
-        tile.UnsetEnemyTile();
-        tileTransform = next;
-        tile = next.gameObject.GetComponent<Tile>();
+        tile.UnsetEnemyTile(this);
+        tile = next;
         tile.SetEnemyTile(this);
+    }
+    protected virtual Tile GetNextTile(MoveTo direction)
+    {
+        Tile next = tile.NextTile(faceDirection);
+        return next;
     }
 }

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 public class PlayerController
 {
     public PlayerModel Model { get; private set; }
@@ -7,6 +8,7 @@ public class PlayerController
     public bool isDetected { get; private set; }
     private bool isMoving = false;
     private Tile tile;
+    [SerializeField] private float moveDuration = 0.5f;
     public Animator animator { get; private set; }
 
     public PlayerController(PlayerModel Playermodel, PlayerView _view, Tile _tile)
@@ -19,20 +21,22 @@ public class PlayerController
         this.View.SetController(this);
         this.Model.SetController(this);
         animator = View.GetComponent<Animator>();
-        PlayerFollow.Instance.GetCamera(View.transform);
+        // PlayerFollow.Instance.GetCamera(View.transform);
     }
     public void Move(MoveTo direction)
     {
         var next = tile.NextTile(direction);
         if (!isMoving && next != null)
         {
+            View.PlayerAnimator.SetTrigger("Jump");
             isMoving = true;
-            View.transform.position = next.Coordinate;
+            var sequence = DOTween.Sequence();
+            sequence.Insert(0, View.transform.DOMove(next.Coordinate, moveDuration));
             Turn(direction.ToV3());
-            PlayerMoved(next);
-            UseUtility();
-            TurnManager.PlayerMoved();
-
+            sequence.OnComplete(() => PlayerMoved(next));
+            // sequence.OnComplete(()=>TurnManager.PlayerMoved());
+            // View.transform.position = next.Coordinate;
+            // UseUtility();            
         }
         return;
     }
@@ -56,8 +60,10 @@ public class PlayerController
     private void PlayerMoved(Tile next)
     {
         isMoving = false;
+        View.PlayerAnimator.SetTrigger("Idle");
         tile.UnsetPlayerTile();
         tile = next;
         tile.SetPlayerTile(this);
+        TurnManager.PlayerMoved();
     }
 }

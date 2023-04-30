@@ -1,10 +1,13 @@
 susing UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 public class EnemyController
 {
     public EnemyType enemyType;
     public EnemyView View { get; private set; }
     public bool isDetected { get; private set; }
+    protected float moveDelay = 0.5f;
+    protected float rotateDelay = 0.25f;
     protected bool isMoving = false;
     protected Tile tile;
     protected MoveTo faceDirection;
@@ -44,9 +47,11 @@ public class EnemyController
     {
         var next = GetNextTile(faceDirection);
         isMoving = true;
-        View.transform.position = next.Coordinate;
-        EnemyMoved(next);
-        return;
+        var sequence = DOTween.Sequence();
+        sequence.Insert(0, View.transform.DOMove(next.Coordinate, moveDelay));
+        sequence.OnComplete(() => EnemyMoved(next));
+        // View.transform.position = next.Coordinate;
+        // EnemyMoved(next);
     }
     public virtual void EnemyTurn()
     {
@@ -79,7 +84,10 @@ public class EnemyController
                 angles.y = -90;
                 break;
         }
-        View.transform.eulerAngles = angles;
+        var sequence = DOTween.Sequence();
+        sequence.Insert(0, View.transform.DORotate(angles, rotateDelay));
+        // sequence.OnComplete(()=>EnemyMoved(nextTile));
+        // View.transform.eulerAngles = angles;
     }
     public virtual void GetDamage()
     {

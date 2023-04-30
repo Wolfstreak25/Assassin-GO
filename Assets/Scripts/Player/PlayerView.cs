@@ -5,6 +5,8 @@ using UnityEngine.UI;
 public class PlayerView : MonoBehaviour
 {
     [SerializeField] private Tile playerTile;
+    [SerializeField] private Animator playerAnimator;
+    public Animator PlayerAnimator { get { return playerAnimator; } }
     private PlayerController Controller;
     private Vector3 movement;
     private float m_timeElapsed = 0f;

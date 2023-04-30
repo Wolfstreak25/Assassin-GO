@@ -8,7 +8,6 @@ public class NextButton : MonoBehaviour
     Scene scene;
     private void OnEnable() 
     {
-        Debug.Log("called");
         scene = SceneManager.GetActiveScene();
     }
     public void Next()

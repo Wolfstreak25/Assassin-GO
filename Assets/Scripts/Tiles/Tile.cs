@@ -4,15 +4,28 @@ using UnityEngine;
 
 public class Tile : MonoBehaviour
 {
-    [SerializeField]    private UtilityType utilityType;
-    private UtilityController utility;
-    [Header("Neighbour Connections")] //Linked Nodes
-    [SerializeField]    private List<Tile> neighbourTiles = new List<Tile>();
-    [SerializeField]    private List<LinkedNodes> linkedNodes = new List<LinkedNodes>();
+    // Tile Atributes
+    [Header("Tile States")]
     [SerializeField]    private bool isEndTile;
     [SerializeField]    private bool isPlayerTile;
     [SerializeField]    private bool isEnemyTile;
+    [SerializeField]    private float nodeSpawnDelay = 0.5f;
+    public bool EndTile {   get{return isEndTile;}   }
     public bool PlayerTile {get{return isPlayerTile;}}
+    // public bool PlayerTile {   get{return isPlayerTile;}   }
+    [Header("Gameobject Reference")]
+    [SerializeField]    private Links linkPrefab;
+    [SerializeField]    private GameObject dot;
+    [SerializeField]    private GameObject endDot;
+    [Header("Tile Utility")]
+    [SerializeField]    private UtilityType utilityType;
+    private UtilityController utility;
+    [Header("Neighbour Connections")] //Linked Nodes
+    [SerializeField]    private List<LinkedNodes> linkedNodes = new List<LinkedNodes>();
+    [SerializeField]    private List<Tile> neighbourTiles = new List<Tile>();
+    public List<Tile> linkedTiles = new List<Tile>();
+    // public List<Tile> LinkedTiles { get{return linkedTiles;}}
+
     private List<EnemyController> enemy = new List<EnemyController>();
     // private EnemyController enemy;
     private PlayerController player;
@@ -28,66 +41,100 @@ public class Tile : MonoBehaviour
             utility = UtilityService.Instance.GetUtility(utilityType);
         }
         NeighbourTiles();
-        LinkToNeighbourTiles();
     }
 
-    private void Awake()
+    private void OnEnable()
     {
         m_coordinate = gameObject.transform.position;
-    }
-    public Tile NextTile (MoveTo direction)
-   {
-        foreach (var item in linkedNodes)
-        {
-            if(item.direction == direction)
-            {
-                // nextTile =  item.tile;
-                return item.tile;
-            }
-        }
-        return null;
         
-   }
-   private void NeighbourTiles()
-   {
+    }
+    public IEnumerator InitializeTile()
+    {
+        yield return new WaitForSeconds(nodeSpawnDelay);
+        if(isEndTile)
+        {
+           GameObject.Instantiate(endDot,Coordinate,Quaternion.identity);
+        }
+        else
+        {
+            GameObject.Instantiate(dot,Coordinate,Quaternion.identity).transform.SetParent(this.transform);
+        }
+        LinkToNeighbourTiles();
+    }
+    private void NeighbourTiles()
+    {
         var board = FloorBoard.Instance;
         foreach (Vector3 dir in FloorBoard.directions)
         {
-			// find a neighboring node at the current direction...
 			Tile foundNeighbor = board.Tiles.Find(n => n.Coordinate == Coordinate + dir);
-
-			// if we find a neighbor at this direction, add it to the list
 			if (foundNeighbor != null && !neighbourTiles.Contains(foundNeighbor))
             {
                 neighbourTiles.Add(foundNeighbor);
             }
         }
-   }
+    }
     private void LinkToNeighbourTiles()
-   {
-        for (int i = 0; i < linkedNodes.Count;i++)
+    {
+        foreach (var item in linkedNodes)
+        // for (int i = 0; i < linkedNodes.Count; i++)
         {
-            var dir = linkedNodes[i].direction.ToV3();
+            // var item = linkedNodes[i];
+            var dir = item.direction.ToV3();
             var tileLink = neighbourTiles.Find(n => n.Coordinate == Coordinate + FloorBoard.spacing * dir);
-            linkedNodes[i].tile = tileLink;
+            if (tileLink != null && item.tile != tileLink)
+            {
+                item.tile = tileLink;
+                if(!linkedTiles.Contains(tileLink))
+                {
+                    linkedTiles.Add(tileLink);
+                    SpawnLinks(tileLink);
+                }
+                StartCoroutine(tileLink.InitializeTile());
+            }
         }
-   }
-   [System.Serializable]
-   public class LinkedNodes
-   {
-        public MoveTo direction;
-        public Tile tile;
-   }
-   public void UseUtility()
-   {
+    }
+    private void SpawnLinks(Tile targetNode)
+    {
+        if (linkPrefab != null)
+        {            
+            // instantiate our prefab and parent to this Node
+            Links linkInstance = GameObject.Instantiate<Links>(linkPrefab, Coordinate, Quaternion.identity);
+            linkInstance.transform.SetParent(this.transform);
+
+            // draw the link
+            Links link = linkInstance;
+            if (link != null)
+            {
+                link.DrawLink(Coordinate, targetNode.Coordinate);
+            }
+            // track what Nodes have been linked to other Nodes
+            if (!targetNode.linkedTiles.Contains(this))
+            {
+                targetNode.linkedTiles.Add(this);
+            }
+        }
+    }
+    public void UseUtility()
+    {
         // Use Utility if any
         if(utilityType != UtilityType.none)
         {
 
         }
-   }
-   public void SetPlayerTile(PlayerController _player)
-   {
+    }
+    public Tile NextTile (MoveTo direction)
+    {
+        foreach (var item in linkedNodes)
+        {
+            if(item.direction == direction)
+            {
+                return item.tile;
+            }
+        }
+        return null;
+    }
+    public void SetPlayerTile(PlayerController _player)
+    {
         if(isEnemyTile)
         {
             foreach (var item in enemy)
@@ -102,7 +149,7 @@ public class Tile : MonoBehaviour
         }
         player = _player;
         isPlayerTile = true;
-   }
+    }
    public void UnsetPlayerTile()
    {
         player = null;
@@ -129,4 +176,11 @@ public class Tile : MonoBehaviour
         if(enemy.Count == 0)
             isEnemyTile = false;
    }
+}
+
+[System.Serializable]
+public class LinkedNodes
+{
+    public MoveTo direction;
+    public Tile tile;
 }
